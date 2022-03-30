@@ -1,5 +1,5 @@
 var APP_NAME = 'myResume';
-var APP_VER = '0.1';
+var APP_VER = '0.3';
 var CACHE_NAME = APP_NAME + '-' + APP_VER;
 
 const REQUIRED_FILES = ['/', '/index.html', 'assets/css/style.css', 'assets/js/main.js'];

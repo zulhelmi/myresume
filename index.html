@@ -46,7 +46,7 @@
     <div class="d-flex flex-column">
 
       <div class="profile">
-        <img src="assets/img/profile-img.jpg" alt="" class="img-fluid rounded-circle">
+        <img src="assets/img/profile-img.jpg" id="profile-picture" alt="" class="img-fluid rounded-circle">
         <h1 class="text-light"><a href="index.html">Mohamad Zulhelmi</a></h1>
         <div class="social-links mt-3 text-center">
           <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
@@ -90,7 +90,7 @@
 
         <div class="row">
           <div class="col-lg-4" data-aos="fade-right">
-            <img src="assets/img/profile-img.jpg" class="img-fluid" alt="">
+            <img src="assets/img/profile-img.jpg" id="gambar-besar" class="img-fluid" alt="">
           </div>
           <div class="col-lg-8 pt-4 pt-lg-0 content" data-aos="fade-left">
             <h3>UI/UX Designer &amp; Web Developer.</h3>
@@ -607,15 +607,28 @@
     if ('serviceWorker' in navigator) {
       // Wait for the 'load' event to not block other work
       window.addEventListener('load', async () => {
-        // Try to register the service worker.
-        try {
-          const reg = await navigator.serviceWorker.register('service-worker.js');
-          console.log('Service worker registered! 😎', reg);
-        } catch (err) {
-          console.log('😥 Service worker registration failed: ', err);
-        }
-      });
-}
+            // Try to register the service worker.
+            try {
+              const reg = await navigator.serviceWorker.register('service-worker.js');
+              console.log('Service worker registered! 😎', reg);
+            } catch (err) {
+              console.log('😥 Service worker registration failed: ', err);
+            }
+          });
+    }
+    fetch("https://fastapi.uitm.edu.my/pwa/biodata",{
+      method: "GET",
+      headers:{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6Ii9wd2EiLCJhcHAiOiJUcmFuaW5nIFBXQSIsImV4cCI6MTY0ODg1MjQ4Miwibm9wZWtlcmphIjoiMjYxMzg2IiwiaWF0IjoxNjQ4NTkzMjgyLCJzZXJpYWwiOjEsInVybCI6WyIvcHdhIl0sImNyZWF0ZWRfYnkiOiJJbnRlZ3Jhc2kiLCJ1c2VyIjoiMjYxMzg2In0.ne5HplMLvX5gC-XUKNeD1yfz4rv6z8Xl5ynMIXVAX40"}
+    })
+    .then(response => response.json())
+    .then(function(data){
+      console.log(data);
+      document.getElementById('profile-picture').src = data.biodata.gambar
+      document.getElementById('gambar-besar').src = data.biodata.gambar
+    })
+    .catch(function(err){
+      console.log(err);
+    })
   </script>
 
 </body>
