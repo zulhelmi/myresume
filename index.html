@@ -611,11 +611,64 @@
             try {
               const reg = await navigator.serviceWorker.register('service-worker.js');
               console.log('Service worker registered! 😎', reg);
+              
+              navigator.serviceWorker.ready.then(function(registration){
+                return registration.pushManager.getSubscription().then(async function(subscription){
+                  if(subscription){
+                    return subscription;
+                  }
+
+                  return registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array('BAjGFaPYEOqObLkJr0ToM_S2ZDmi0xNZ6EHwtiVwhEUV7Ji9kgGsXrJOVvrlk2UE2oE4s1jTIvAL3r-vkix7rxs')
+                  });
+                });
+              }).then(function(subscription){
+                fetch('https://api.afb.my/webpush',{
+                  method: 'POST',
+                  headers: {
+                    'Content-type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    regtoken: 'PWAtrainingMelaka',
+                    clientid: subscription
+                  })
+                })
+              });
+              
             } catch (err) {
               console.log('😥 Service worker registration failed: ', err);
             }
           });
     }
+    
+    new Promise(function(resolve,reject){
+      var permissionResult = Notification.requestPermission(function(result){
+        resolve(result);
+      });
+      if(permissionResult){
+        permissionResult.then(resolve,reject);
+      }
+    }).then(function(permissionResult){
+      if(permissionResult != 'granted'){
+        throw new Error('We weren\'t granted permission.');
+      }
+    });
+
+
+    // Boilerplate borrowed from https://www.npmjs.com/package/web-push#using-vapid-key-for-applicationserverkey
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    };
+
+
     fetch("https://fastapi.uitm.edu.my/pwa/biodata",{
       method: "GET",
       headers:{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6Ii9wd2EiLCJhcHAiOiJUcmFuaW5nIFBXQSIsImV4cCI6MTY0ODg1MjQ4Miwibm9wZWtlcmphIjoiMjYxMzg2IiwiaWF0IjoxNjQ4NTkzMjgyLCJzZXJpYWwiOjEsInVybCI6WyIvcHdhIl0sImNyZWF0ZWRfYnkiOiJJbnRlZ3Jhc2kiLCJ1c2VyIjoiMjYxMzg2In0.ne5HplMLvX5gC-XUKNeD1yfz4rv6z8Xl5ynMIXVAX40"}

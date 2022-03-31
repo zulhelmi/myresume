@@ -1,5 +1,5 @@
 var APP_NAME = 'myResume';
-var APP_VER = '0.3';
+var APP_VER = '0.6';
 var CACHE_NAME = APP_NAME + '-' + APP_VER;
 
 const REQUIRED_FILES = ['/', '/index.html', 'assets/css/style.css', 'assets/js/main.js'];
@@ -63,3 +63,48 @@ self.addEventListener('message', function (event) {
       self.skipWaiting();
     }
   });
+
+self.addEventListener('push',function(event){
+	const data = event.data.json();
+	var options;
+
+	if(data.url){
+		options = {
+			body: data.body,
+			badge: "pwanotification.png",
+			icon: "icon-192x192.png",
+			vibrate: [100,50,100],
+			data:{url:data.url},
+			actions: [
+				{
+					action: 'web-action',
+					tittle: 'Open web'
+				}
+			]
+		}
+	}else{
+		options = {
+			body: data.body,
+			badge: "pwanotification.png",
+			icon: "icon-192x192.png",
+			vibrate: [100,50,100]
+		}
+	}
+	self.registration.showNotification(data.title,options)
+});
+
+self.addEventListener('notificationclick',function(event){
+	if(!event.action){
+		console.info('Notification clik');
+		return;
+	}
+	switch(event.action){
+		case 'web-action':
+			event.notification.close();
+
+			event.waitUntil(
+				clients.openWindow("https://zulhelmi.netlify.app")
+			);
+			break;
+	}
+});
